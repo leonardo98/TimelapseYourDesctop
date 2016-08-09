@@ -1,0 +1,7 @@
+Build/
+Debug/
+*.avi
+*.bmp
+*.txt
+*.vcxproj
+*.filters
