@@ -6,7 +6,6 @@
 int CaptureAnImage(HWND hWnd)
 {
 	HDC hdcScreen;
-	HDC hdcWindow;
 	HDC hdcMemDC = NULL;
 	HBITMAP hbmScreen = NULL;
 	BITMAP bmpScreen;
@@ -14,10 +13,9 @@ int CaptureAnImage(HWND hWnd)
 	// Retrieve the handle to a display device context for the client 
 	// area of the window. 
 	hdcScreen = GetDC(NULL);
-	hdcWindow = GetDC(hWnd);
 
 	// Create a compatible DC which is used in a BitBlt from the window DC
-	hdcMemDC = CreateCompatibleDC(hdcWindow);
+	hdcMemDC = CreateCompatibleDC(hdcScreen);
 
 	if (!hdcMemDC)
 	{
@@ -25,33 +23,8 @@ int CaptureAnImage(HWND hWnd)
 		goto done;
 	}
 
-	// Get the client area for size calculation
-	RECT rcClient;
-	GetClientRect(hWnd, &rcClient);
-	rcClient.left = 0;
-	rcClient.top = 0;
-	rcClient.bottom = 300;
-	rcClient.right = 600;
-
-	//This is the best stretch mode
-	SetStretchBltMode(hdcWindow, HALFTONE);
-
-	//The source DC is the entire screen and the destination DC is the current window (HWND)
-	if (!StretchBlt(hdcWindow,
-		0, 0,
-		rcClient.right, rcClient.bottom,
-		hdcScreen,
-		0, 0,
-		GetSystemMetrics(SM_CXSCREEN),
-		GetSystemMetrics(SM_CYSCREEN),
-		SRCCOPY))
-	{
-		MessageBox(hWnd, L"StretchBlt has failed", L"Failed", MB_OK);
-		goto done;
-	}
-
 	// Create a compatible bitmap from the Window DC
-	hbmScreen = CreateCompatibleBitmap(hdcWindow, rcClient.right - rcClient.left, rcClient.bottom - rcClient.top);
+	hbmScreen = CreateCompatibleBitmap(hdcScreen, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN));
 
 	if (!hbmScreen)
 	{
@@ -65,8 +38,8 @@ int CaptureAnImage(HWND hWnd)
 	// Bit block transfer into our compatible memory DC.
 	if (!BitBlt(hdcMemDC,
 		0, 0,
-		rcClient.right - rcClient.left, rcClient.bottom - rcClient.top,
-		hdcWindow,
+		GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN),
+		hdcScreen,
 		0, 0,
 		SRCCOPY))
 	{
@@ -102,7 +75,7 @@ int CaptureAnImage(HWND hWnd)
 
 	// Gets the "bits" from the bitmap and copies them into a buffer 
 	// which is pointed to by lpbitmap.
-	GetDIBits(hdcWindow, hbmScreen, 0,
+	GetDIBits(hdcScreen, hbmScreen, 0,
 		(UINT)bmpScreen.bmHeight,
 		lpbitmap,
 		(BITMAPINFO *)&bi, DIB_RGB_COLORS);
@@ -144,7 +117,6 @@ done:
 	DeleteObject(hbmScreen);
 	DeleteObject(hdcMemDC);
 	ReleaseDC(NULL, hdcScreen);
-	ReleaseDC(hWnd, hdcWindow);
 
 	return 0;
 }
