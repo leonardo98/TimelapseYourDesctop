@@ -13,23 +13,23 @@
 bool ChooseCodec(HWND hWnd, AVICOMPRESSOPTIONS *pOptionsVideo);
 bool CreateVideoStream(DWORD dwFrameRate, size_t WidthFrame, size_t HeightFrame, PAVISTREAM *ppStreamVideo);
 bool MakeCompressedVideoStream(size_t WidthFrame, size_t HeightFrame, AVICOMPRESSOPTIONS *pVideoOptions, PAVISTREAM pStreamVideo, PAVISTREAM *ppCompressedStreamVideo);
-bool CreateAudioStream(const WAVEFORMATEX *pwf, PAVIFILE pAviFile, PAVISTREAM *ppStreamAudio);
 bool WriteFrameVideoCompress(PAVISTREAM pCompressedStreamVideo, BITMAPINFO *pBmp, DWORD dwFrameNum);
-bool WriteFrameAudio(PAVISTREAM  pStreamAudio, void *pData, size_t sizeData, DWORD dwFrameNum);
+//bool CreateAudioStream(const WAVEFORMATEX *pwf, PAVIFILE pAviFile, PAVISTREAM *ppStreamAudio);
+//bool WriteFrameAudio(PAVISTREAM  pStreamAudio, void *pData, size_t sizeData, DWORD dwFrameNum);
 void AviClean();
 
 AVICOMPRESSOPTIONS OptionsVideo;
 PAVIFILE pAviFile = 0;
 PAVISTREAM pStreamVideo = 0;
 PAVISTREAM pCompressedStreamVideo = 0;
-PAVISTREAM pStreamAudio = 0;
+//PAVISTREAM pStreamAudio = 0;
 
 const int WidthFrame = 640;
 const int HeightFrame = 480;
 const int FrameRate = 30;
 const int CountSecond = 10;
 const int CountFrames = FrameRate * CountSecond;
-const int AmplitudeSound = 0x4000;
+//const int AmplitudeSound = 0x4000;
 
 
 int main(int argc, char* argv[])
@@ -53,21 +53,21 @@ int main(int argc, char* argv[])
         return 0;
     }
 
-    WAVEFORMATEX wf;
-    ZeroMemory(&wf, sizeof(WAVEFORMATEX));
-    wf.cbSize = sizeof(WAVEFORMATEX);
-    wf.wFormatTag = WAVE_FORMAT_PCM;
-    wf.nChannels = 2;
-    wf.nSamplesPerSec = 44100;
-    wf.wBitsPerSample = 16;
-    wf.nBlockAlign = (wf.wBitsPerSample * wf.nChannels) / 8;
-    wf.nAvgBytesPerSec = wf.nSamplesPerSec * wf.nBlockAlign;
+    //WAVEFORMATEX wf;
+    //ZeroMemory(&wf, sizeof(WAVEFORMATEX));
+    //wf.cbSize = sizeof(WAVEFORMATEX);
+    //wf.wFormatTag = WAVE_FORMAT_PCM;
+    //wf.nChannels = 2;
+    //wf.nSamplesPerSec = 44100;
+    //wf.wBitsPerSample = 16;
+    //wf.nBlockAlign = (wf.wBitsPerSample * wf.nChannels) / 8;
+    //wf.nAvgBytesPerSec = wf.nSamplesPerSec * wf.nBlockAlign;
 
-    if (!CreateAudioStream(&wf, pAviFile, &pStreamAudio))
-    {
-        AviClean();
-        return 0;
-    }
+    //if (!CreateAudioStream(&wf, pAviFile, &pStreamAudio))
+    //{
+    //    AviClean();
+    //    return 0;
+    //}
 
     const DWORD sizeVideoFrame = WidthFrame * HeightFrame * 3;
     void *pVideo = malloc(sizeVideoFrame + sizeof(BITMAPINFOHEADER));
@@ -83,8 +83,8 @@ int main(int argc, char* argv[])
 
     char *pBits = (char*)pVideo + sizeof(BITMAPINFOHEADER);
 
-    int CountSoundInFrame = wf.nAvgBytesPerSec / FrameRate;
-    DWORD *pSound = (DWORD*)malloc(CountSoundInFrame);
+    //int CountSoundInFrame = wf.nAvgBytesPerSec / FrameRate;
+    //DWORD *pSound = (DWORD*)malloc(CountSoundInFrame);
 
     printf("Recording ");
 
@@ -99,24 +99,24 @@ int main(int argc, char* argv[])
             pBits[i2 * 3 + 2] = ((char*)&color)[2];
         }
 
-        //Audio frame
-        for (int i3 = 0; i3<CountSoundInFrame / 4; i3++)
-        {
-            unsigned short x = (((float)rand()) / RAND_MAX)*AmplitudeSound;
-            unsigned short y = (((float)rand()) / RAND_MAX)*AmplitudeSound;
-            ((WORD*)pSound)[i3 * 2] = x;
-            ((WORD*)pSound)[i3 * 2 + 1] = y;
-        }
+        ////Audio frame
+        //for (int i3 = 0; i3<CountSoundInFrame / 4; i3++)
+        //{
+        //    unsigned short x = (((float)rand()) / RAND_MAX)*AmplitudeSound;
+        //    unsigned short y = (((float)rand()) / RAND_MAX)*AmplitudeSound;
+        //    ((WORD*)pSound)[i3 * 2] = x;
+        //    ((WORD*)pSound)[i3 * 2 + 1] = y;
+        //}
 
         if (!WriteFrameVideoCompress(pCompressedStreamVideo, (BITMAPINFO*)pBitm, i))
             break;
-        if (!WriteFrameAudio(pStreamAudio, pSound, CountSoundInFrame, i))
-            break;
+        //if (!WriteFrameAudio(pStreamAudio, pSound, CountSoundInFrame, i))
+        //    break;
 
         if (!(i%FrameRate))
             printf(".");
     }
-    free(pSound);
+    //free(pSound);
     free(pVideo);
     AviClean();
 }
@@ -255,11 +255,11 @@ void AviClean()
         pCompressedStreamVideo = 0;
     }
 
-    if (pStreamAudio)
-    {
-        AVIStreamRelease(pStreamAudio);
-        pStreamAudio = 0;
-    }
+    //if (pStreamAudio)
+    //{
+    //    AVIStreamRelease(pStreamAudio);
+    //    pStreamAudio = 0;
+    //}
 
     if (pAviFile)
     {

@@ -19,7 +19,7 @@ int CaptureAnImage(HWND hWnd)
 
 	if (!hdcMemDC)
 	{
-		MessageBox(hWnd, L"CreateCompatibleDC has failed", L"Failed", MB_OK);
+		MessageBox(hWnd, TEXT("CreateCompatibleDC has failed"), TEXT("Failed"), MB_OK);
 		goto done;
 	}
 
@@ -28,7 +28,7 @@ int CaptureAnImage(HWND hWnd)
 
 	if (!hbmScreen)
 	{
-		MessageBox(hWnd, L"CreateCompatibleBitmap Failed", L"Failed", MB_OK);
+		MessageBox(hWnd, TEXT("CreateCompatibleBitmap Failed"), TEXT("Failed"), MB_OK);
 		goto done;
 	}
 
@@ -43,7 +43,7 @@ int CaptureAnImage(HWND hWnd)
 		0, 0,
 		SRCCOPY))
 	{
-		MessageBox(hWnd, L"BitBlt has failed", L"Failed", MB_OK);
+		MessageBox(hWnd, TEXT("BitBlt has failed"), TEXT("Failed"), MB_OK);
 		goto done;
 	}
 
@@ -81,7 +81,7 @@ int CaptureAnImage(HWND hWnd)
 		(BITMAPINFO *)&bi, DIB_RGB_COLORS);
 
 	// A file is created, this is where we will save the screen capture.
-	HANDLE hFile = CreateFile(L"captured.bmp",
+	HANDLE hFile = CreateFile(TEXT("captured.bmp"),
 		GENERIC_WRITE,
 		0,
 		NULL,
