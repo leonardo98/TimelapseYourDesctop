@@ -4,53 +4,53 @@
 
 OutputVideo::OutputVideo()
 {
-	m_pAviFile = 0;
-	m_pStreamVideo = 0;
-	m_pCompressedStreamVideo = 0;
-	m_currentFrame = 0;
+    m_pAviFile = 0;
+    m_pStreamVideo = 0;
+    m_pCompressedStreamVideo = 0;
+    m_currentFrame = 0;
 }
 
 bool OutputVideo::Stop()
 {
     AviClean();
-	free(m_pVideo);
-	m_pAviFile = 0;
-	return true;
+    free(m_pVideo);
+    m_pAviFile = 0;
+    return true;
 }
 
 bool OutputVideo::Init(const char *filename, int widthFrame, int heightFrame, int frameRate)
 {
-	if (m_pAviFile)
-		return false;
+    if (m_pAviFile)
+        return false;
 
-	m_currentFrame = 0;
-	m_widthFrame = widthFrame;
-	m_heightFrame = heightFrame;
-	m_frameRate = frameRate;
+    m_currentFrame = 0;
+    m_widthFrame = widthFrame;
+    m_heightFrame = heightFrame;
+    m_frameRate = frameRate;
 
-	AVIFileInit();
-	if (AVIFileOpen(&m_pAviFile, TEXT(filename), OF_WRITE | OF_CREATE, NULL) != AVIERR_OK)
-		return false;
+    AVIFileInit();
+    if (AVIFileOpen(&m_pAviFile, TEXT(filename), OF_WRITE | OF_CREATE, NULL) != AVIERR_OK)
+        return false;
 
-	if (!CreateVideoStream(frameRate, widthFrame, heightFrame, &m_pStreamVideo))
-	{
-		AviClean();
-		return false;
-	}
+    if (!CreateVideoStream(frameRate, widthFrame, heightFrame, &m_pStreamVideo))
+    {
+        AviClean();
+        return false;
+    }
 
-	if (!MakeCompressedVideoStream(widthFrame, heightFrame, &m_optionsVideo, m_pStreamVideo, &m_pCompressedStreamVideo))
-	{
-		AviClean();
-		return false;
-	}
+    if (!MakeCompressedVideoStream(widthFrame, heightFrame, &m_optionsVideo, m_pStreamVideo, &m_pCompressedStreamVideo))
+    {
+        AviClean();
+        return false;
+    }
 
     const DWORD sizeVideoFrame = widthFrame * heightFrame * 3;
     m_pVideo = malloc(sizeVideoFrame + sizeof(BITMAPINFOHEADER));
 
-	m_pBitm = (BITMAPINFOHEADER*)m_pVideo;
+    m_pBitm = (BITMAPINFOHEADER*)m_pVideo;
     ZeroMemory(m_pBitm, sizeof(BITMAPINFOHEADER));
     
-	m_pBitm->biWidth = widthFrame;
+    m_pBitm->biWidth = widthFrame;
     m_pBitm->biHeight = heightFrame;
     m_pBitm->biBitCount = 24;
     m_pBitm->biPlanes = 1;
@@ -60,23 +60,23 @@ bool OutputVideo::Init(const char *filename, int widthFrame, int heightFrame, in
 
     m_pBits = (char*)m_pVideo + sizeof(BITMAPINFOHEADER);
 
-	return true;
+    return true;
 }
 
 int OutputVideo::getWidth() {
-	return m_widthFrame;
+    return m_widthFrame;
 }
 
 int OutputVideo::getHeight() {
-	return m_heightFrame;
+    return m_heightFrame;
 }
 
 int OutputVideo::getFrameRate() {
-	return m_frameRate;
+    return m_frameRate;
 }
 
 char *OutputVideo::getFrameBuffer() {
-	return m_pBits;
+    return m_pBits;
 }
 bool OutputVideo::ChooseCodec(HWND hWnd)
 {
@@ -127,8 +127,8 @@ bool OutputVideo::CreateVideoStream(DWORD dwFrameRate, size_t WidthFrame, size_t
 
 bool OutputVideo::MakeCompressedVideoStream(size_t WidthFrame, size_t HeightFrame, AVICOMPRESSOPTIONS *pVideoOptions,
     PAVISTREAM m_pStreamVideo, PAVISTREAM *ppCompressedStreamVideo)
-{	
-	BITMAPINFO bi;
+{    
+    BITMAPINFO bi;
     ZeroMemory(&bi, sizeof(BITMAPINFO));
     bi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
     bi.bmiHeader.biWidth = WidthFrame;
@@ -174,7 +174,7 @@ bool OutputVideo::AddFrame()
 {
     if (!WriteFrameVideoCompress(m_pCompressedStreamVideo, (BITMAPINFO*)m_pBitm, m_currentFrame++))
         return false;
-	return true;
+    return true;
 }
 
 
