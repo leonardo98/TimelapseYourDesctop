@@ -125,11 +125,11 @@ int CaptureWindow::capture(char *data)
     int w = width();
     for (int i = 0; i < h; i++)
     {
+        int p = i * 3 * w;
+        int p2 = i * 4 * w;
         for (int j = 0; j < w; j++)
         {
-            data[j * 3 + i * 3 * w] = m_lpbitmap[j * 4 + i * 4 * w];
-            data[j * 3 + i * 3 * w + 1] = m_lpbitmap[j * 4 + i * 4 * w + 1];
-            data[j * 3 + i * 3 * w + 2] = m_lpbitmap[j * 4 + i * 4 * w + 2];
+            memcpy(&data[j * 3 + p], &m_lpbitmap[j * 4 + p2], 3);
         }
     }
 

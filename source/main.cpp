@@ -14,28 +14,32 @@ int main(int argc, char* argv[])
     if (!ov.Init("video.avi", screen.width(), screen.height(), 24))
         return 0;
 
-    printf("Recording ");
+    printf("Recording. Press <Esc> to exit\n");
 
-    char *pBits = ov.getFrameBuffer();
-    for (int i = 0; i < 100; i++)
+    MSG msg;
+    memset(&msg, 0, sizeof(MSG));
+
+    HWND hWnd = GetConsoleWindow();
+
+    int i = 0;
+    while (true)
     {
-        //Video frame
         if (screen.capture(ov.getFrameBuffer()) != 0)
         {
             break;
         }
-        //for (int i2 = 0; i2 < (ov.getWidth() * ov.getHeight()); i2++)
-        //{
-        //    pBits[i2 * 3] = 
-        //    pBits[i2 * 3 + 1] = 
-        //    pBits[i2 * 3 + 2] = rand() % 256;
-        //}
 
         if (!ov.AddFrame())
             break;
+        ++i;
 
-        if (!(i%(ov.getFrameRate())))
+        if (!(i % (ov.getFrameRate())))
             printf(".");
+
+        if (GetAsyncKeyState(VK_ESCAPE))
+        {
+            break;
+        }
     }
 
     ov.Stop();
